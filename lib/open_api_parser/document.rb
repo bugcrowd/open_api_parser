@@ -4,15 +4,16 @@ module OpenApiParser
   class Document
     def self.resolve(path, file_cache = OpenApiParser::FileCache.new, context_variables: {})
       file_cache.get(path) do
-        content = YAML.safe_load(ERB.new(File.read(path)).result(**context_variables))
-        Document.new(path, content, file_cache).resolve
+        content = YAML.safe_load(ERB.new(File.read(path)).result_with_hash(**context_variables))
+        Document.new(path, content, file_cache, context_variables).resolve
       end
     end
 
-    def initialize(path, content, file_cache)
+    def initialize(path, content, file_cache, context_variables)
       @path = path
       @content = content
       @file_cache = file_cache
+      @context_variables = context_variables
     end
 
     def resolve
@@ -40,7 +41,7 @@ module OpenApiParser
         raw_uri = fragment['$ref']
         ref = OpenApiParser::Reference.new(raw_uri)
         fully_resolved, referrent_document, referrent_pointer =
-          ref.resolve(@path, current_pointer, @content, @file_cache)
+          ref.resolve(@path, current_pointer, @content, @file_cache, @context_variables)
         if fully_resolved
           [referrent_document, referrent_pointer]
         else

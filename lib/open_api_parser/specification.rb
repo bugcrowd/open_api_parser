@@ -5,8 +5,8 @@ module OpenApiParser
     META_SCHEMA_PATH_2 = File.expand_path('../../resources/swagger_meta_schema_2.0.json', __dir__)
     META_SCHEMA_PATH_3 = File.expand_path('../../resources/swagger_meta_schema_3.0.json', __dir__)
 
-    def self.resolve(path, validate_meta_schema: true)
-      raw_specification = Document.resolve(path)
+    def self.resolve(path, validate_meta_schema: true, context_variables: {})
+      raw_specification = Document.resolve(path, context_variables: context_variables)
 
       if validate_meta_schema
         meta_schema = JSON.parse(File.read(meta_schema_path(raw_specification)))

@@ -6,7 +6,7 @@ module OpenApiParser
       @raw_uri = raw_uri
     end
 
-    def resolve(base_path, base_pointer, current_document, file_cache)
+    def resolve(base_path, base_pointer, current_document, file_cache, context_variables)
       ref_uri = normalize_file_uri(Addressable::URI.parse(@raw_uri))
       base_uri = normalize_file_uri(Addressable::URI.parse(base_path)).omit(:fragment).normalize
       resolved_uri = base_uri.join(ref_uri).omit(:fragment).normalize
@@ -17,7 +17,7 @@ module OpenApiParser
           if base_uri == resolved_uri
             [false, current_document, base_pointer]
           else
-            [true, OpenApiParser::Document.resolve(resolved_uri.path, file_cache), '']
+            [true, OpenApiParser::Document.resolve(resolved_uri.path, file_cache, context_variables: context_variables), '']
           end
         else
           raise "$ref with scheme #{ref_uri.scheme} is not supported"
